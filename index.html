@@ -1,1 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nada's Jujutsu Adventure</title>
 
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#3b0764,#111827);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+overflow:hidden;
+}
+
+.screen{
+width:90%;
+max-width:700px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(10px);
+padding:30px;
+border-radius:20px;
+box-shadow:0 0 30px rgba(0,0,0,.4);
+text-align:center;
+animation:fade .6s;
+}
+
+.hidden{
+display:none;
+}
+
+h1{
+font-size:42px;
+margin-bottom:20px;
+}
+
+h2{
+margin-bottom:20px;
+}
+
+p{
+line-height:1.7;
+margin-bottom:20px;
+}
+
+button{
+background:#7c3aed;
+border:none;
+padding:15px 30px;
+border-radius:12px;
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:.3s;
+margin:10px;
+}
+
+button:hover{
+background:#9333ea;
+transform:scale(1.05);
+}
+
+#hud{
+display:flex;
+justify-content:space-between;
+margin-bottom:20px;
+font-size:20px;
+}
+
+#question{
+font-size:26px;
+margin:25px 0;
+}
+
+.answer{
+display:block;
+width:100%;
+margin:12px auto;
+}
+
+#message{
+margin-top:20px;
+font-size:22px;
+font-weight:bold;
+min-height:35px;
+}
+
+canvas{
+border:3px solid white;
+border-radius:15px;
+margin-top:20px;
+background:white;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(25px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+</style>
+</head>
+
+<body>
+
+<div id="startScreen" class="screen">
+
+<h1>⚔️ Nada's Jujutsu Adventure ⚔️</h1>
+
+<p>
+Welcome, Nada!
+</p>
+
+<p>
+Become the strongest sorcerer by answering 10 anime-inspired quiz questions.
+Each correct answer earns points.
+Wrong answers cost one life.
+Lose all your lives and the mission ends!
+</p>
+
+<button id="startBtn">
+Start Adventure
+</button>
+
+</div>
+
+<div id="gameScreen" class="screen hidden">
+
+<div id="hud">
+
+<div>
+⭐ Score:
+<span id="score">0</span>
+</div>
+
+<div>
+❤️ Lives:
+<span id="lives">3</span>
+</div>
+
+</div>
+
+<div id="question">
+Question
+</div>
+
+<div id="answers">
+</div>
+
+<div id="message"></div>
+
+</div>
+
+<div id="endScreen" class="screen hidden">
+
+<h2 id="endTitle"></h2>
+
+<p id="endText"></p>
+
+<canvas
+id="certificate"
+width="600"
+height="400">
+</canvas>
+
+<br>
+
+<button onclick="location.reload()">
+Play Again
+</button>
+
+</div>
+
+<script>
+
+// Variables
+let score = 0;
+let lives = 3;
+let currentQuestion = 0;
+
+// HTML Elements
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const endScreen = document.getElementById("endScreen");
+
+const scoreEl = document.getElementById("score");
+const livesEl = document.getElementById("lives");
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const messageEl = document.getElementById("message");
+
+document
+.getElementById("startBtn")
+.addEventListener("click",startGame);
+
+function startGame(){
+
+startScreen.classList.add("hidden");
+gameScreen.classList.remove("hidden");
+
+}
+
+</script>
+
+</body>
+</html>
+// ===========================
+// QUIZ QUESTIONS
+// ===========================
+
+const questions = [
+
+{
+question:"Who is the main protagonist of Jujutsu Kaisen?",
+answers:[
+"Yuji Itadori",
+"Megumi",
+"Gojo",
+"Yuta"
+],
+correct:0
+},
+
+{
+question:"What object did Yuji swallow?",
+answers:[
+"A magic stone",
+"Sukuna's Finger",
+"A cursed sword",
+"A ring"
+],
+correct:1
+},
+
+{
+question:"Who is famous for wearing a blindfold?",
+answers:[
+"Nanami",
+"Gojo",
+"Toge",
+"Panda"
+],
+correct:1
+},
+
+{
+question:"What kind of energy do sorcerers use?",
+answers:[
+"Magic Energy",
+"Cursed Energy",
+"Spirit Energy",
+"Dragon Energy"
+],
+correct:1
+},
+
+{
+question:"What school does Yuji attend?",
+answers:[
+"Tokyo Jujutsu High",
+"Kyoto Magic School",
+"Hero Academy",
+"Curse Academy"
+],
+correct:0
+},
+
+{
+question:"Which character can speak normally only with difficulty because of his technique?",
+answers:[
+"Toge Inumaki",
+"Yuji",
+"Todo",
+"Geto"
+],
+correct:0
+},
+
+{
+question:"What animal is Panda?",
+answers:[
+"Bear",
+"Panda",
+"Wolf",
+"Tiger"
+],
+correct:1
+},
+
+{
+question:"Who is Yuji's powerful curse living inside him?",
+answers:[
+"Mahito",
+"Sukuna",
+"Jogo",
+"Hanami"
+],
+correct:1
+},
+
+{
+question:"Which color is Gojo's hair?",
+answers:[
+"Black",
+"Blue",
+"White",
+"Brown"
+],
+correct:2
+},
+
+{
+question:"What is the goal of a Jujutsu Sorcerer?",
+answers:[
+"Collect treasure",
+"Defeat curses",
+"Build robots",
+"Become king"
+],
+correct:1
+}
+
+];
+
+// ===========================
+// SHOW QUESTION
+// ===========================
+
+function showQuestion(){
+
+messageEl.textContent="";
+
+const q=questions[currentQuestion];
+
+questionEl.textContent=
+(currentQuestion+1)+"/10 - "+q.question;
+
+answersEl.innerHTML="";
+
+q.answers.forEach((answer,index)=>{
+
+const btn=document.createElement("button");
+
+btn.className="answer";
+
+btn.textContent=answer;
+
+btn.onclick=()=>checkAnswer(index);
+
+answersEl.appendChild(btn);
+
+});
+
+}
+
+// ===========================
+// CHECK ANSWER
+// ===========================
+
+function checkAnswer(index){
+
+const q=questions[currentQuestion];
+
+if(index===q.correct){
+
+score+=10;
+
+scoreEl.textContent=score;
+
+messageEl.textContent="✅ Correct!";
+
+}else{
+
+lives--;
+
+livesEl.textContent=lives;
+
+messageEl.textContent="❌ Wrong!";
+
+}
+
+setTimeout(()=>{
+
+if(lives<=0){
+
+endGame(false);
+
+return;
+
+}
+
+currentQuestion++;
+
+if(currentQuestion>=questions.length){
+
+endGame(true);
+
+return;
+
+}
+
+showQuestion();
+
+},900);
+
+}
+
+// ===========================
+// UPDATE START GAME
+// ===========================
+
+function startGame(){
+
+startScreen.classList.add("hidden");
+
+gameScreen.classList.remove("hidden");
+
+score=0;
+lives=3;
+currentQuestion=0;
+
+scoreEl.textContent=score;
+livesEl.textContent=lives;
+
+showQuestion();
+
+}
+  // ===========================
+// SOUND EFFECTS
+// ===========================
+
+const audio = new (window.AudioContext || window.webkitAudioContext)();
+
+function beep(freq,time){
+
+const osc = audio.createOscillator();
+const gain = audio.createGain();
+
+osc.frequency.value = freq;
+osc.type = "triangle";
+
+osc.connect(gain);
+gain.connect(audio.destination);
+
+gain.gain.value = 0.15;
+
+osc.start();
+
+setTimeout(()=>{
+osc.stop();
+},time);
+
+}
+
+function correctSound(){
+beep(700,150);
+}
+
+function wrongSound(){
+beep(250,250);
+}
+
+// تعديل checkAnswer
+
+const oldCheck = checkAnswer;
+
+checkAnswer = function(index){
+
+const q = questions[currentQuestion];
+
+if(index===q.correct){
+
+correctSound();
+
+score+=10;
+
+scoreEl.textContent=score;
+
+messageEl.textContent="✅ Correct!";
+
+}else{
+
+wrongSound();
+
+lives--;
+
+livesEl.textContent=lives;
+
+messageEl.textContent="❌ Wrong!";
+
+}
+
+setTimeout(()=>{
+
+if(lives<=0){
+
+endGame(false);
+return;
+
+}
+
+currentQuestion++;
+
+if(currentQuestion>=questions.length){
+
+endGame(true);
+return;
+
+}
+
+showQuestion();
+
+},900);
+
+}
+
+// ===========================
+// END GAME
+// ===========================
+
+function endGame(win){
+
+gameScreen.classList.add("hidden");
+endScreen.classList.remove("hidden");
+
+const title=document.getElementById("endTitle");
+const text=document.getElementById("endText");
+
+if(win){
+
+title.textContent="🏆 Congratulations!";
+text.textContent="You completed Nada's Jujutsu Adventure!";
+
+drawCertificate();
+
+speakMessage();
+
+}else{
+
+title.textContent="Game Over";
+text.textContent="Try Again!";
+document.getElementById("certificate").style.display="none";
+
+}
+
+}
+
+// ===========================
+// CERTIFICATE
+// ===========================
+
+function drawCertificate(){
+
+const canvas=document.getElementById("certificate");
+const ctx=canvas.getContext("2d");
+
+ctx.fillStyle="#fff";
+ctx.fillRect(0,0,600,400);
+
+ctx.strokeStyle="#7c3aed";
+ctx.lineWidth=8;
+ctx.strokeRect(20,20,560,360);
+
+ctx.fillStyle="#000";
+
+ctx.font="36px Arial";
+ctx.fillText("Victory Certificate",145,80);
+
+ctx.font="28px Arial";
+ctx.fillText("Awarded To",235,145);
+
+ctx.font="40px Georgia";
+ctx.fillStyle="#7c3aed";
+ctx.fillText("Nada",245,205);
+
+ctx.fillStyle="#000";
+ctx.font="24px Arial";
+ctx.fillText("For completing",200,270);
+ctx.fillText("Nada's Jujutsu Adventure",120,310);
+
+ctx.font="18px Arial";
+ctx.fillText(new Date().toLocaleDateString(),235,350);
+
+}
+
+// ===========================
+// SPEECH
+// ===========================
+
+function speakMessage(){
+
+const text="Thank you for being so kind and helpful for me. You are truly an inspiration to me. Thank you for finishing the game. Bye bye.";
+
+const speech=new SpeechSynthesisUtterance(text);
+
+speech.lang="en-US";
+speech.pitch=1.4;
+speech.rate=0.95;
+
+const voices=speechSynthesis.getVoices();
+
+const female=voices.find(v=>
+/female|zira|samantha|aria|jenny|ava|susan|victoria|karen/i.test(v.name)
+);
+
+if(female){
+speech.voice=female;
+}
+
+speechSynthesis.speak(speech);
+
+}
